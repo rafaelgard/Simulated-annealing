@@ -1,7 +1,6 @@
 import numpy as np
 from PIL import Image 
 import matplotlib.pyplot as plt
-
 np.random.seed(1)
 
 solucao = np.array([
@@ -10,34 +9,13 @@ solucao = np.array([
     [0, 1, 1, 0],
     [1, 0, 0, 1]])
 
-
-# solucao = np.array([
-#     [1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-#     [1, 1, 0, 0, 0, 0, 0, 0, 1, 1],
-#     [1, 0, 1, 0, 0, 0, 0, 1, 0, 1],
-#     [1, 0, 0, 1, 0, 0, 1, 0, 0, 1],
-#     [1, 0, 0, 0, 1, 1, 0, 0, 0, 1],
-#     [1, 0, 0, 0, 1, 1, 0, 0, 0, 1],
-#     [1, 0, 0, 1, 0, 0, 1, 0, 0, 1],
-#     [1, 0, 1, 0, 0, 0, 0, 1, 0, 1],
-#     [1, 1, 0, 0, 0, 0, 0, 0, 1, 1],
-#     [1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
-    
-    
-#     ])
-
-
-# tamanho_matriz = (10,10)
-# solucao = np.random.randint(0,2,tamanho_matriz) 
-
 print(solucao)
-
-# breakpoint()
 
 l = solucao.shape[0]
 c = solucao.shape[1]
 
 def avalia_solucao(solucao, solucao_temporaria):
+    '''Avalia quantos pixels da solução estão corretos'''
     return np.sum(solucao==solucao_temporaria)/(l*c)
 
 def destroi_solucao(solucao_temporaria):
@@ -49,7 +27,6 @@ def destroi_solucao(solucao_temporaria):
     parte_destruida = parte_destruida[0:indice]
 
     return parte_destruida
-
 
 def reconstroi_solucao(solucao_destruida):
 
@@ -65,123 +42,84 @@ def gera_solucao_inicial():
     '''Gera uma solução inicial aleatória'''
     return np.random.randint(0,2, size=l*c).reshape(l,c)
     
+def main():
+    temperatura = 1000
+    ALFA = 0.99
 
-# solucao_inicial = gera_solucao_inicial()
-# print('solucao_inicial')
-# print(solucao_inicial)
+    solucao_inicial = gera_solucao_inicial()
+    best_sol = solucao_inicial
+    best_aval = avalia_solucao(solucao, solucao_inicial)
 
+    plt.figure(figsize=(10, 8))
 
-# aval = avalia_solucao(solucao, solucao_inicial)
+    plt.subplot(2, 2, 1)
 
-# print('aval')
-# print(aval)
+    solucao_plot = plt.imshow(solucao)
+    plt.title('Solução Esperada')
 
-# sol_destruida = destroi_solucao(solucao_inicial)
-
-# sol_reconstruida = reconstroi_solucao(sol_destruida)
-
-
-# print('sol_reconstruida')
-# print(sol_reconstruida)
-
-
-# aval_nova_sol = avalia_solucao(solucao, sol_reconstruida)
-
-# print('aval')
-# print(aval)
+    temperatura_values = []
+    best_aval_values = []
 
 
-temperatura = 1000
-ALFA = 0.99
+    i=0
+    while temperatura>0.001:
 
-# aval_best = avalia_solucao(solucao, solucao_inicial)
+        sol_destruida = destroi_solucao(best_sol)
 
+        sol_reconstruida = reconstroi_solucao(sol_destruida)
 
-solucao_inicial = gera_solucao_inicial()
-best_sol = solucao_inicial
-best_aval = avalia_solucao(solucao, solucao_inicial)
+        aval_nova_sol = avalia_solucao(solucao, sol_reconstruida)
 
-# Inicialize a figura fora do loop
-plt.figure(figsize=(10, 8))
+        delta = best_aval - aval_nova_sol
 
-# Subplot para a segunda imagem (solucao)
-plt.subplot(2, 2, 1)
-# solucao = Image.open('caminho_da_imagem2.jpg')
-solucao_plot = plt.imshow(solucao)
-plt.title('Solução Esperada')
-
-
-# Subplot para o gráfico da temperatura
-# plt.subplot(1, 3, 3)
-
-temperatura_values = []
-best_aval_values = []
-
-
-i=0
-while temperatura>0.001:
-# while best_aval<1:
-
-    sol_destruida = destroi_solucao(best_sol)
-
-    sol_reconstruida = reconstroi_solucao(sol_destruida)
-
-    aval_nova_sol = avalia_solucao(solucao, sol_reconstruida)
-
-    delta = best_aval - aval_nova_sol
-
-    if delta<0:
-        best_sol = sol_reconstruida
-        best_aval = aval_nova_sol
-
-    else:
-        numero_aleatorio = np.random.uniform(0, 1)
-
-        if numero_aleatorio<np.exp(-delta/temperatura):
+        if delta<0:
             best_sol = sol_reconstruida
             best_aval = aval_nova_sol
 
+        else:
+            numero_aleatorio = np.random.uniform(0, 1)
 
-    best_aval_values.append(best_aval)
+            if numero_aleatorio<np.exp(-delta/temperatura):
+                best_sol = sol_reconstruida
+                best_aval = aval_nova_sol
 
-    temperatura = temperatura*ALFA
+        best_aval_values.append(best_aval)
 
-    temperatura_values.append(temperatura)
+        temperatura = temperatura*ALFA
 
-    print(f'Temperatura:{temperatura} - best_aval:{best_aval}')
+        temperatura_values.append(temperatura)
 
-    # if temperatura<0.01 and best_aval<0.9:
-    #     temperatura+=1
+        print(f'Temperatura:{temperatura} - best_aval:{best_aval}')
 
-    i+=1
-    if i%10==0:
-        # Limpe o subplot da primeira imagem (best_sol) e adicione a nova imagem
-        plt.subplot(2, 2, 3)
-        # plt.cla()
-        plt.imshow(best_sol)
-        plt.title('Melhor Solução Encontrada')
+        i+=1
+        if i%10==0:
+            plt.subplot(2, 2, 3)
+            plt.imshow(best_sol)
+            plt.title('Melhor Solução Encontrada')
 
-        # Atualize o subplot da segunda imagem (solucao)
-        # solucao = Image.open('caminho_da_imagem2.jpg')
-        solucao_plot.set_data(solucao)
-        plt.subplot(2, 2, 2)
+            solucao_plot.set_data(solucao)
+            plt.subplot(2, 2, 2)
 
-        plt.cla()
-        plt.plot(temperatura_values, color='r')
-        plt.title('Temperatura')
+            plt.cla()
+            plt.plot(temperatura_values, color='r')
+            plt.title('Temperatura')
 
 
-        plt.subplot(2, 2, 4)
-        plt.cla()
-        plt.plot(best_aval_values)
-        plt.title(f'Acurácia')
+            plt.subplot(2, 2, 4)
+            plt.cla()
+            plt.plot(best_aval_values)
+            plt.title(f'Acurácia')
 
-        plt.pause(0.0001)  # Tempo de pausa entre as iterações em segundos
-        plt.draw()
+            plt.pause(0.0001)  # Tempo de pausa entre as iterações em segundos
+            plt.draw()
 
-plt.show()
-print('best_sol')
-print(best_sol)
+    plt.show()
+    print('best_sol')
+    print(best_sol)
 
-print('best_aval')
-print(best_aval)
+    print('best_aval')
+    print(best_aval)
+
+
+if __name__ == '__main__':
+    main()
