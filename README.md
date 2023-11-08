@@ -36,7 +36,7 @@ Para utilizar o código, você pode seguir estes passos:
     - py -m venv env
 
 - 3 - Instale as dependências
-    - pip install requirements.txt
+    - pip install -r requirements.txt
 
 - 4 - Caso você queira utilizar na geração de outra figura, basta apenas alterar a variável "solução", rodar o código e verificar o resultado.
 
