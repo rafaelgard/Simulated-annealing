@@ -31,8 +31,7 @@ Sim, é possível, conforme podemos verificar no vídeo abaixo:
 Para utilizar o código, você pode seguir estes passos:
 
 - 1 - Clone o respositório
-    -git clone https://github.com/rafaelgard/Simulated-annealing.git
-
+  
 - 2 - Crie um ambiente virtual:
     - py -m venv env
 
